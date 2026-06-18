@@ -23,7 +23,6 @@ const DB = {
   },
   _set(key, data) { localStorage.setItem(key, JSON.stringify(data)); },
 
-  // ── Spieler ────────────────────────────────────────────────────────────────
   getSpieler() { return this._get(this.KEYS.SPIELER); },
   getSpielerById(id) { return this.getSpieler().find(s => s.id === id) || null; },
   getSpielerByGruppe(gruppe) {
@@ -50,7 +49,6 @@ const DB = {
     this._set(this.KEYS.ANWESENHEIT, this.getAnwesenheit().filter(a => a.spielerId !== id));
   },
 
-  // ── Eltern ────────────────────────────────────────────────────────────────
   getEltern() { return this._get(this.KEYS.ELTERN); },
   getElternById(id) { return this.getEltern().find(e => e.id === id) || null; },
   saveEltern(data) {
@@ -70,7 +68,6 @@ const DB = {
     this._set(this.KEYS.ELTERN, this.getEltern().filter(e => e.id !== id));
   },
 
-  // ── Trainings ─────────────────────────────────────────────────────────────
   getTrainings() { return this._get(this.KEYS.TRAININGS); },
   getTrainingById(id) { return this.getTrainings().find(t => t.id === id) || null; },
   saveTraining(data) {
@@ -91,7 +88,6 @@ const DB = {
     this._set(this.KEYS.ANWESENHEIT, this.getAnwesenheit().filter(a => a.trainingId !== id));
   },
 
-  // ── Anwesenheit ───────────────────────────────────────────────────────────
   getAnwesenheit() { return this._get(this.KEYS.ANWESENHEIT); },
   getAnwesenheitByTraining(trainingId) {
     return this.getAnwesenheit().filter(a => a.trainingId === trainingId);
@@ -114,7 +110,6 @@ const DB = {
       }).length;
   },
 
-  // ── Abos ─────────────────────────────────────────────────────────────────
   getAbos() { return this._get(this.KEYS.ABOS); },
   getAboById(id) { return this.getAbos().find(a => a.id === id) || null; },
   getAbosBySpielerId(spielerId) { return this.getAbos().filter(a => a.spielerId === spielerId); },
@@ -142,7 +137,6 @@ const DB = {
     this._set(this.KEYS.ABOS, this.getAbos().filter(a => a.id !== id));
   },
 
-  // ── Benutzer ──────────────────────────────────────────────────────────────
   getUsers() { return this._get(this.KEYS.USERS); },
   getUserById(id) { return this.getUsers().find(u => u.id === id) || null; },
   getUserByBenutzername(benutzername) {
@@ -171,7 +165,6 @@ const DB = {
     this._set(this.KEYS.USERS, this.getUsers().filter(u => u.id !== id));
   },
 
-  // ── Schwarzes Brett ───────────────────────────────────────────────────────
   getBulletin() { return this._get(this.KEYS.BULLETIN); },
   getActiveBulletin() {
     const heute = new Date().toISOString().split('T')[0];
@@ -196,7 +189,6 @@ const DB = {
     this._set(this.KEYS.BULLETIN, this.getBulletin().filter(b => b.id !== id));
   },
 
-  // ── Seed ──────────────────────────────────────────────────────────────────
   seed() {
     const vorhandene = this.getSpieler();
     const alteGruppen = ['U8','U10','U12','U14','Erwachsene'];
@@ -208,17 +200,15 @@ const DB = {
     const heute = new Date().toISOString().split('T')[0];
     const monat = heute.substring(0, 7);
 
-    // Benutzer immer sicherstellen (vor dem frühen return)
     if (this.getUsers().length === 0) {
       const firstEltern = this.getEltern()[0];
       this._set(this.KEYS.USERS, [
-        { id: this.uuid(), benutzername: 'admin',   passwort: 'ProAcademy2026', name: 'Administrator',   rolle: 'admin',   aktiv: true, gruppen: [], elternId: null, erstelltAm: now },
-        { id: this.uuid(), benutzername: 'trainer', passwort: 'Trainer2026',    name: 'Demo Trainer',     rolle: 'trainer', aktiv: true, gruppen: ['2007','2010','2012','2014','2016','2018','2021'], elternId: null, erstelltAm: now },
-        { id: this.uuid(), benutzername: 'eltern',  passwort: 'Eltern2026',     name: 'Eltern Mustermann',rolle: 'eltern',  aktiv: true, gruppen: [], elternId: firstEltern?.id || null, email: 'k.mustermann@email.de', erstelltAm: now },
+        { id: this.uuid(), benutzername: 'admin',   passwort: 'ProAcademy2026', name: 'Administrator',    rolle: 'admin',   aktiv: true, gruppen: [], elternId: null, erstelltAm: now },
+        { id: this.uuid(), benutzername: 'trainer', passwort: 'Trainer2026',    name: 'Demo Trainer',      rolle: 'trainer', aktiv: true, gruppen: ['2007','2010','2012','2014','2016','2018','2021'], elternId: null, erstelltAm: now },
+        { id: this.uuid(), benutzername: 'eltern',  passwort: 'Eltern2026',     name: 'Eltern Mustermann', rolle: 'eltern',  aktiv: true, gruppen: [], elternId: firstEltern?.id || null, email: 'k.mustermann@email.de', erstelltAm: now },
       ]);
     }
 
-    // elternId reparieren falls noch null (wenn eltern erst nach users erstellt)
     const users = this.getUsers();
     const eu = users.find(u => u.rolle === 'eltern' && !u.elternId);
     if (eu) {
@@ -231,7 +221,7 @@ const DB = {
       return;
     }
 
-    const sid = Array.from({ length: 10 }, () => this.uuid());
+    const sid = Array.from({ length: 9 }, () => this.uuid());
     const eid = Array.from({ length: 3 }, () => this.uuid());
     const aid = Array.from({ length: 4 }, () => this.uuid());
 
@@ -245,8 +235,6 @@ const DB = {
       { id: sid[6], vorname: 'Lukas',  nachname: 'Braun',      geburtsdatum: '2018-08-20', gruppe: '2018', status: 'aktiv', elternIds: [eid[2]], aboId: null,   notizen: '',          aktiv: true, erstelltAm: now },
       { id: sid[7], vorname: 'Anna',   nachname: 'Hoffmann',   geburtsdatum: '2010-04-18', gruppe: '2010', status: 'aktiv', elternIds: [eid[0]], aboId: null,   notizen: '',          aktiv: true, elternEmail: 'k.mustermann@email.de', erstelltAm: now },
       { id: sid[8], vorname: 'Felix',  nachname: 'Krause',     geburtsdatum: '2021-02-09', gruppe: '2021', status: 'aktiv', elternIds: [eid[2]], aboId: null,   notizen: '',          aktiv: true, erstelltAm: now },
-      // Neuzugang Demo
-      { id: sid[9], vorname: 'Mia',    nachname: 'Neumann',    geburtsdatum: '2015-06-12', gruppe: '',     status: 'neuzugang', elternIds: [], aboId: null, notizen: '', aktiv: true, erstelltAm: now },
     ];
 
     const eltern = [
@@ -291,7 +279,7 @@ const DB = {
     ];
 
     const anwesenheit = [];
-    const vergangene = trainings.filter(t => t.datum < heute);
+    const vergangene = trainings.filter(tr => tr.datum < heute);
     vergangene.forEach(tr => {
       spieler.filter(s => s.gruppe === tr.gruppe).forEach(s => {
         anwesenheit.push({ id: this.uuid(), trainingId: tr.id, spielerId: s.id, anwesend: Math.random() > 0.25, notiert: now });
@@ -304,7 +292,6 @@ const DB = {
     this._set(this.KEYS.ABOS,        abos);
     this._set(this.KEYS.ANWESENHEIT, anwesenheit);
 
-    // elternId im eltern-User auf eid[0] setzen
     const usersNow = this.getUsers();
     const euNow = usersNow.find(u => u.rolle === 'eltern');
     if (euNow) { euNow.elternId = eid[0]; this._set(this.KEYS.USERS, usersNow); }
