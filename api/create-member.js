@@ -29,6 +29,7 @@ export default async function handler(req, res) {
   const customerDetails = session.customer_details || {};
 
   const elternEmail = customerDetails.email || '';
+  const elternTelefon = customerDetails.phone || '';
   const elternFullName = customerDetails.name || '';
   const nameParts = elternFullName.trim().split(' ');
   const elternVorname = nameParts[0] || '';
@@ -60,6 +61,7 @@ export default async function handler(req, res) {
         vorname: elternVorname,
         nachname: elternNachname,
         email: elternEmail,
+        telefon: elternTelefon,
         status: 'aktiv',
       })
       .select()
